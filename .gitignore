@@ -42,3 +42,5 @@ CVS/ # Subversion and CVS folders
 *.sql
 *.sqlite # Database files
 
+data/
+wandb/
