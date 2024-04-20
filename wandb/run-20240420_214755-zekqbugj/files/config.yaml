@@ -1,0 +1,31 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.6
+    cli_version: 0.16.6
+    framework: torch
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    start_time: 1713646079.0
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      2:
+      - 1
+      - 41
+      - 55
+      3:
+      - 1
+      - 2
+      - 23
+      4: 3.11.6
+      5: 0.16.6
+      8:
+      - 1
+      - 4
+      - 5
+      13: darwin-arm64

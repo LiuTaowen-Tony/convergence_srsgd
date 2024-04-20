@@ -1,0 +1,27 @@
+2024-04-20 21:41:34,907 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Current SDK version is 0.16.6
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Configure stats pid to 1548
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Loading settings from /Users/tony/.config/wandb/settings
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Loading settings from /Users/tony/convergence_sr/wandb/settings
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Applying login settings: {}
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_setup.py:_flush():76] Applying login settings: {'api_key': '***REDACTED***'}
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_init.py:_log_setup():521] Logging user logs to /Users/tony/convergence_sr/wandb/run-20240420_214134-bgh8gz1l/logs/debug.log
+2024-04-20 21:41:34,908 INFO    MainThread:1548 [wandb_init.py:_log_setup():522] Logging internal logs to /Users/tony/convergence_sr/wandb/run-20240420_214134-bgh8gz1l/logs/debug-internal.log
+2024-04-20 21:41:34,909 INFO    MainThread:1548 [wandb_init.py:init():561] calling init triggers
+2024-04-20 21:41:34,909 INFO    MainThread:1548 [wandb_init.py:init():568] wandb.init called with sweep_config: {}
+config: {}
+2024-04-20 21:41:34,909 INFO    MainThread:1548 [wandb_init.py:init():586] re-initializing run, found existing run on stack: 5mwnhomb
+2024-04-20 21:41:34,910 INFO    MainThread:1548 [wandb_run.py:_finish():2064] finishing run tony_t_liu/full_precision_train/5mwnhomb
+2024-04-20 21:41:34,911 INFO    MainThread:1548 [wandb_run.py:_atexit_cleanup():2304] got exitcode: 0
+2024-04-20 21:41:34,912 INFO    MainThread:1548 [wandb_run.py:_restore():2287] restore
+2024-04-20 21:41:34,913 INFO    MainThread:1548 [wandb_run.py:_restore():2293] restore done
+2024-04-20 21:42:15,818 INFO    MainThread:1548 [wandb_init.py:init():611] starting backend
+2024-04-20 21:42:15,818 INFO    MainThread:1548 [wandb_init.py:init():615] setting up manager
+2024-04-20 21:42:15,822 INFO    MainThread:1548 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2024-04-20 21:42:15,831 INFO    MainThread:1548 [wandb_init.py:init():623] backend started and connected
+2024-04-20 21:42:15,868 INFO    MainThread:1548 [wandb_run.py:_label_probe_notebook():1299] probe notebook
+2024-04-20 21:42:15,868 INFO    MainThread:1548 [wandb_run.py:_label_probe_notebook():1309] Unable to probe notebook: 'NoneType' object has no attribute 'get'
+2024-04-20 21:42:15,868 INFO    MainThread:1548 [wandb_init.py:init():715] updated telemetry
+2024-04-20 21:42:15,873 INFO    MainThread:1548 [wandb_init.py:init():748] communicating run to backend with 90.0 second timeout

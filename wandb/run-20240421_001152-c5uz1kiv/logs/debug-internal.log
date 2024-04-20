@@ -1,0 +1,204 @@
+2024-04-21 00:11:57,706 INFO    StreamThr :80928 [internal.py:wandb_internal():86] W&B internal server running at pid: 80928, started at: 2024-04-21 00:11:57.704566
+2024-04-21 00:11:57,715 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status
+2024-04-21 00:11:57,715 INFO    WriterThread:80928 [datastore.py:open_for_write():87] open: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/run-c5uz1kiv.wandb
+2024-04-21 00:11:57,716 DEBUG   SenderThread:80928 [sender.py:send():379] send: header
+2024-04-21 00:11:57,716 DEBUG   SenderThread:80928 [sender.py:send():379] send: run
+2024-04-21 00:11:58,067 INFO    SenderThread:80928 [dir_watcher.py:__init__():211] watching files in: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files
+2024-04-21 00:11:58,067 INFO    SenderThread:80928 [sender.py:_start_run_threads():1124] run started: c5uz1kiv with start time 1713654716.742646
+2024-04-21 00:11:58,072 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: check_version
+2024-04-21 00:11:58,072 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: check_version
+2024-04-21 00:11:58,190 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: run_start
+2024-04-21 00:11:58,191 DEBUG   HandlerThread:80928 [system_info.py:__init__():26] System info init
+2024-04-21 00:11:58,192 DEBUG   HandlerThread:80928 [system_info.py:__init__():41] System info init done
+2024-04-21 00:11:58,192 INFO    HandlerThread:80928 [system_monitor.py:start():194] Starting system monitor
+2024-04-21 00:11:58,192 INFO    SystemMonitor:80928 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-04-21 00:11:58,192 INFO    HandlerThread:80928 [system_monitor.py:probe():214] Collecting system info
+2024-04-21 00:11:58,192 INFO    SystemMonitor:80928 [interfaces.py:start():190] Started cpu monitoring
+2024-04-21 00:11:58,193 DEBUG   HandlerThread:80928 [system_info.py:probe():150] Probing system
+2024-04-21 00:11:58,193 INFO    SystemMonitor:80928 [interfaces.py:start():190] Started disk monitoring
+2024-04-21 00:11:58,194 INFO    SystemMonitor:80928 [interfaces.py:start():190] Started gpuapple monitoring
+2024-04-21 00:11:58,197 INFO    SystemMonitor:80928 [interfaces.py:start():190] Started memory monitoring
+2024-04-21 00:11:58,199 INFO    SystemMonitor:80928 [interfaces.py:start():190] Started network monitoring
+2024-04-21 00:11:58,199 DEBUG   HandlerThread:80928 [system_info.py:_probe_git():135] Probing git
+2024-04-21 00:11:58,230 DEBUG   HandlerThread:80928 [system_info.py:_probe_git():143] Probing git done
+2024-04-21 00:11:58,230 DEBUG   HandlerThread:80928 [system_info.py:probe():198] Probing system done
+2024-04-21 00:11:58,230 DEBUG   HandlerThread:80928 [system_monitor.py:probe():223] {'os': 'macOS-14.3-arm64-arm-64bit', 'python': '3.11.6', 'heartbeatAt': '2024-04-20T23:11:58.193177', 'startedAt': '2024-04-20T23:11:52.690824', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '<python with no main file>', 'codePathLocal': None, 'git': {'remote': None, 'commit': None}, 'email': 'tony_t_liu@outlook.com', 'root': '/Users/tony/convergence_sr', 'host': 'dyn3253-172.wlan.ic.ac.uk', 'username': 'tony', 'executable': '/Users/tony/venvs/_Users_tony_convergence_sr_.venv/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 3204, 'min': 600, 'max': 3204}, 'cpu_freq_per_core': [{'current': 3204, 'min': 600, 'max': 3204}], 'disk': {'/': {'total': 460.4317207336426, 'used': 13.369789123535156}}, 'gpuapple': {'type': 'arm', 'vendor': 'Apple'}, 'memory': {'total': 8.0}}
+2024-04-21 00:11:58,230 INFO    HandlerThread:80928 [system_monitor.py:probe():224] Finished collecting system info
+2024-04-21 00:11:58,230 INFO    HandlerThread:80928 [system_monitor.py:probe():227] Publishing system info
+2024-04-21 00:11:58,230 INFO    HandlerThread:80928 [system_monitor.py:probe():229] Finished publishing system info
+2024-04-21 00:11:58,231 DEBUG   SenderThread:80928 [sender.py:send():379] send: files
+2024-04-21 00:11:58,231 INFO    SenderThread:80928 [sender.py:_save_file():1390] saving file wandb-metadata.json with policy now
+2024-04-21 00:11:58,300 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: python_packages
+2024-04-21 00:11:58,300 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-21 00:11:58,300 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: python_packages
+2024-04-21 00:11:58,301 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-21 00:11:58,301 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: stop_status
+2024-04-21 00:11:58,407 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,407 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,407 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,408 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,408 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,409 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,409 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,411 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,411 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-21 00:11:58,557 DEBUG   SenderThread:80928 [sender.py:send():379] send: telemetry
+2024-04-21 00:11:58,557 DEBUG   SenderThread:80928 [sender.py:send():379] send: telemetry
+2024-04-21 00:11:58,558 DEBUG   SenderThread:80928 [sender.py:send():379] send: history
+2024-04-21 00:11:58,558 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: summary_record
+2024-04-21 00:11:58,559 INFO    SenderThread:80928 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-04-21 00:11:58,761 INFO    wandb-upload_0:80928 [upload_job.py:push():131] Uploaded file /var/folders/5k/p1lpx1251kb1k65ncs316vdw0000gn/T/tmp_2cyrux6wandb/gsh8fqmp-wandb-metadata.json
+2024-04-21 00:11:59,110 INFO    Thread-193:80928 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-summary.json
+2024-04-21 00:11:59,111 INFO    Thread-193:80928 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/requirements.txt
+2024-04-21 00:11:59,112 INFO    Thread-193:80928 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-metadata.json
+2024-04-21 00:11:59,112 INFO    Thread-193:80928 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/output.log
+2024-04-21 00:12:01,117 INFO    Thread-193:80928 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/output.log
+2024-04-21 00:12:03,577 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:08,601 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:13,304 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-21 00:12:13,304 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-21 00:12:13,304 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: stop_status
+2024-04-21 00:12:14,463 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:19,481 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:24,504 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:28,315 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-21 00:12:28,316 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-21 00:12:28,316 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: stop_status
+2024-04-21 00:12:30,460 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:31,242 INFO    Thread-193:80928 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/config.yaml
+2024-04-21 00:12:35,703 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:36,824 DEBUG   SenderThread:80928 [sender.py:send():379] send: telemetry
+2024-04-21 00:12:36,832 DEBUG   SenderThread:80928 [sender.py:send():379] send: exit
+2024-04-21 00:12:36,833 INFO    SenderThread:80928 [sender.py:send_exit():586] handling exit code: 0
+2024-04-21 00:12:36,833 INFO    SenderThread:80928 [sender.py:send_exit():588] handling runtime: 38
+2024-04-21 00:12:36,840 INFO    SenderThread:80928 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-04-21 00:12:36,842 INFO    SenderThread:80928 [sender.py:send_exit():594] send defer
+2024-04-21 00:12:36,845 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,845 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 0
+2024-04-21 00:12:36,847 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,849 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 0
+2024-04-21 00:12:36,850 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 1
+2024-04-21 00:12:36,850 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,850 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 1
+2024-04-21 00:12:36,850 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,850 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 1
+2024-04-21 00:12:36,850 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 2
+2024-04-21 00:12:36,851 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,851 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 2
+2024-04-21 00:12:36,851 INFO    HandlerThread:80928 [system_monitor.py:finish():203] Stopping system monitor
+2024-04-21 00:12:36,851 DEBUG   SystemMonitor:80928 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-04-21 00:12:36,851 DEBUG   SystemMonitor:80928 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-04-21 00:12:36,852 DEBUG   SystemMonitor:80928 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-04-21 00:12:36,852 INFO    HandlerThread:80928 [interfaces.py:finish():202] Joined cpu monitor
+2024-04-21 00:12:36,855 INFO    HandlerThread:80928 [interfaces.py:finish():202] Joined disk monitor
+2024-04-21 00:12:36,855 INFO    HandlerThread:80928 [interfaces.py:finish():202] Joined gpuapple monitor
+2024-04-21 00:12:36,855 INFO    HandlerThread:80928 [interfaces.py:finish():202] Joined memory monitor
+2024-04-21 00:12:36,856 INFO    HandlerThread:80928 [interfaces.py:finish():202] Joined network monitor
+2024-04-21 00:12:36,856 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,856 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 2
+2024-04-21 00:12:36,856 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 3
+2024-04-21 00:12:36,856 DEBUG   SenderThread:80928 [sender.py:send():379] send: telemetry
+2024-04-21 00:12:36,856 DEBUG   SenderThread:80928 [sender.py:send():379] send: stats
+2024-04-21 00:12:36,857 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,857 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 3
+2024-04-21 00:12:36,857 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,857 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 3
+2024-04-21 00:12:36,857 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 4
+2024-04-21 00:12:36,858 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,858 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 4
+2024-04-21 00:12:36,858 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,858 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 4
+2024-04-21 00:12:36,858 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 5
+2024-04-21 00:12:36,858 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,858 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 5
+2024-04-21 00:12:36,864 DEBUG   SenderThread:80928 [sender.py:send():379] send: summary
+2024-04-21 00:12:36,867 INFO    SenderThread:80928 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-04-21 00:12:36,867 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,867 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 5
+2024-04-21 00:12:36,867 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 6
+2024-04-21 00:12:36,867 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:36,867 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 6
+2024-04-21 00:12:36,867 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:36,867 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 6
+2024-04-21 00:12:36,873 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: status_report
+2024-04-21 00:12:37,038 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 7
+2024-04-21 00:12:37,039 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:37,039 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 7
+2024-04-21 00:12:37,043 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:37,043 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 7
+2024-04-21 00:12:37,272 INFO    Thread-193:80928 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-summary.json
+2024-04-21 00:12:37,273 INFO    Thread-193:80928 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/config.yaml
+2024-04-21 00:12:37,838 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-21 00:12:38,669 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 8
+2024-04-21 00:12:38,671 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: poll_exit
+2024-04-21 00:12:38,671 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:38,672 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 8
+2024-04-21 00:12:38,673 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:38,673 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 8
+2024-04-21 00:12:38,674 INFO    SenderThread:80928 [job_builder.py:build():318] Attempting to build job artifact
+2024-04-21 00:12:38,677 INFO    SenderThread:80928 [job_builder.py:_get_source_type():466] no source found
+2024-04-21 00:12:38,678 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 9
+2024-04-21 00:12:38,678 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:38,678 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 9
+2024-04-21 00:12:38,678 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:38,678 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 9
+2024-04-21 00:12:38,678 INFO    SenderThread:80928 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-04-21 00:12:38,843 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-21 00:12:39,282 INFO    SenderThread:80928 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/output.log
+2024-04-21 00:12:39,283 INFO    SenderThread:80928 [dir_watcher.py:finish():388] scan: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files
+2024-04-21 00:12:39,283 INFO    SenderThread:80928 [dir_watcher.py:finish():402] scan save: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/requirements.txt requirements.txt
+2024-04-21 00:12:39,283 INFO    SenderThread:80928 [dir_watcher.py:finish():402] scan save: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/output.log output.log
+2024-04-21 00:12:39,286 INFO    SenderThread:80928 [dir_watcher.py:finish():402] scan save: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/config.yaml config.yaml
+2024-04-21 00:12:39,286 INFO    SenderThread:80928 [dir_watcher.py:finish():402] scan save: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-summary.json wandb-summary.json
+2024-04-21 00:12:39,289 INFO    SenderThread:80928 [dir_watcher.py:finish():402] scan save: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-metadata.json wandb-metadata.json
+2024-04-21 00:12:39,289 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 10
+2024-04-21 00:12:39,290 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: poll_exit
+2024-04-21 00:12:39,290 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:39,291 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 10
+2024-04-21 00:12:39,292 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:39,292 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 10
+2024-04-21 00:12:39,292 INFO    SenderThread:80928 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-21 00:12:39,645 INFO    wandb-upload_1:80928 [upload_job.py:push():131] Uploaded file /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/output.log
+2024-04-21 00:12:39,695 INFO    wandb-upload_0:80928 [upload_job.py:push():131] Uploaded file /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/requirements.txt
+2024-04-21 00:12:39,707 INFO    wandb-upload_2:80928 [upload_job.py:push():131] Uploaded file /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/config.yaml
+2024-04-21 00:12:39,779 INFO    wandb-upload_3:80928 [upload_job.py:push():131] Uploaded file /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/files/wandb-summary.json
+2024-04-21 00:12:39,845 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-21 00:12:39,846 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: poll_exit
+2024-04-21 00:12:39,984 INFO    Thread-192 (_thread_body):80928 [sender.py:transition_state():614] send defer: 11
+2024-04-21 00:12:39,984 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:39,985 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 11
+2024-04-21 00:12:39,985 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:39,985 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 11
+2024-04-21 00:12:39,985 INFO    SenderThread:80928 [file_pusher.py:join():178] waiting for file pusher
+2024-04-21 00:12:39,986 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 12
+2024-04-21 00:12:39,986 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:39,986 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 12
+2024-04-21 00:12:39,986 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:39,987 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 12
+2024-04-21 00:12:39,987 INFO    SenderThread:80928 [file_stream.py:finish():614] file stream finish called
+2024-04-21 00:12:40,137 INFO    SenderThread:80928 [file_stream.py:finish():618] file stream finish is done
+2024-04-21 00:12:40,138 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 13
+2024-04-21 00:12:40,138 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:40,138 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 13
+2024-04-21 00:12:40,138 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:40,138 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 13
+2024-04-21 00:12:40,138 INFO    SenderThread:80928 [sender.py:transition_state():614] send defer: 14
+2024-04-21 00:12:40,139 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: defer
+2024-04-21 00:12:40,139 DEBUG   SenderThread:80928 [sender.py:send():379] send: final
+2024-04-21 00:12:40,139 INFO    HandlerThread:80928 [handler.py:handle_request_defer():172] handle defer: 14
+2024-04-21 00:12:40,139 DEBUG   SenderThread:80928 [sender.py:send():379] send: footer
+2024-04-21 00:12:40,139 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: defer
+2024-04-21 00:12:40,139 INFO    SenderThread:80928 [sender.py:send_request_defer():610] handle sender defer: 14
+2024-04-21 00:12:40,140 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-21 00:12:40,140 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: poll_exit
+2024-04-21 00:12:40,140 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-21 00:12:40,140 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: server_info
+2024-04-21 00:12:40,140 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: get_summary
+2024-04-21 00:12:40,141 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: sampled_history
+2024-04-21 00:12:40,141 DEBUG   SenderThread:80928 [sender.py:send_request():406] send_request: server_info
+2024-04-21 00:12:40,269 DEBUG   HandlerThread:80928 [handler.py:handle_request():146] handle_request: shutdown
+2024-04-21 00:12:40,270 INFO    HandlerThread:80928 [handler.py:finish():866] shutting down handler
+2024-04-21 00:12:41,144 INFO    WriterThread:80928 [datastore.py:close():296] close: /Users/tony/convergence_sr/wandb/run-20240421_001152-c5uz1kiv/run-c5uz1kiv.wandb
+2024-04-21 00:12:41,271 INFO    SenderThread:80928 [sender.py:finish():1546] shutting down sender
+2024-04-21 00:12:41,271 INFO    SenderThread:80928 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-21 00:12:41,271 INFO    SenderThread:80928 [file_pusher.py:join():178] waiting for file pusher
