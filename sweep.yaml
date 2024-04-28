@@ -1,0 +1,24 @@
+method: bayes
+metric:
+  goal: minimize
+  name: test_loss
+parameters:
+  batch_size:
+    distribution: q_log_uniform_values
+    max: 1024
+    min: 256
+    q: 8
+  grad_acc_steps:
+    distribution: q_log_uniform_values
+    max: 64
+    min: 1
+    q: 1
+  lr_factor:
+    distribution: uniform
+    max: 0.005
+    min: 5e-05
+  pct_start:
+    distribution: uniform
+    max: 0.5
+    min: 0.05
+program: train.py
