@@ -45,3 +45,4 @@ CVS/ # Subversion and CVS folders
 cifar10/
 data/
 wandb/
+mnist/

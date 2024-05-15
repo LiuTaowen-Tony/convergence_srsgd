@@ -1,3 +1,4 @@
+import timm
 import wandb
 import qtorch.quant
 import tqdm
@@ -9,12 +10,133 @@ import qtorch
 from qtorch.quant import Quantizer
 import math
 
+import torch
+from torch.optim.lr_scheduler import _LRScheduler
+from optimizers.Signum import Signum
+
+class CosineAnnealingLinearWarmup(_LRScheduler):
+    def __init__(
+            self,
+            optimizer: torch.optim.Optimizer,
+            first_cycle_steps: int,
+            min_lrs: list[float] = None,
+            cycle_mult: float = 1.,
+            warmup_steps: int = 0,
+            gamma: float = 1.,
+            last_epoch: int = -1,
+            min_lrs_pow: int = None,
+                 ):
+
+        '''
+        :param optimizer: warped optimizer
+        :param first_cycle_steps: number of steps for the first scheduling cycle
+        :param min_lrs: same as eta_min, min value to reach for each param_groups learning rate
+        :param cycle_mult: cycle steps magnification
+        :param warmup_steps: number of linear warmup steps
+        :param gamma: decreasing factor of the max learning rate for each cycle
+        :param last_epoch: index of the last epoch
+        :param min_lrs_pow: power of 10 factor of decrease of max_lrs (ex: min_lrs_pow=2, min_lrs = max_lrs * 10 ** -2
+        '''
+        assert warmup_steps < first_cycle_steps, "Warmup steps should be smaller than first cycle steps"
+        assert min_lrs_pow is None and min_lrs is not None or min_lrs_pow is not None and min_lrs is None, \
+            "Only one of min_lrs and min_lrs_pow should be specified"
+        
+        # inferred from optimizer param_groups
+        max_lrs = [g["lr"] for g in optimizer.state_dict()['param_groups']]
+
+        if min_lrs_pow is not None:
+            min_lrs = [i * (10 ** -min_lrs_pow) for i in max_lrs]
+
+        if min_lrs is not None:
+            assert len(min_lrs)==len(max_lrs),\
+                "The length of min_lrs should be the same as max_lrs, but found {} and {}".format(
+                    len(min_lrs), len(max_lrs)
+                )
+
+        self.first_cycle_steps = first_cycle_steps  # first cycle step size
+        self.cycle_mult = cycle_mult  # cycle steps magnification
+        self.base_max_lrs = max_lrs  # first max learning rate
+        self.max_lrs = max_lrs  # max learning rate in the current cycle
+        self.min_lrs = min_lrs  # min learning rate
+        self.warmup_steps = warmup_steps  # warmup step size
+        self.gamma = gamma  # decrease rate of max learning rate by cycle
+
+        self.cur_cycle_steps = first_cycle_steps  # first cycle step size
+        self.cycle = 0  # cycle count
+        self.step_in_cycle = last_epoch  # step size of the current cycle
+
+        super().__init__(optimizer, last_epoch)
+
+        assert len(optimizer.param_groups) == len(self.max_lrs),\
+            "Expected number of max learning rates provided ({}) to be the same as the number of groups parameters ({})".format(
+                len(max_lrs), len(optimizer.param_groups))
+        
+        assert len(optimizer.param_groups) == len(self.min_lrs),\
+            "Expected number of min learning rates provided ({}) to be the same as the number of groups parameters ({})".format(
+                len(max_lrs), len(optimizer.param_groups))
+
+        # set learning rate min_lr
+        self.init_lr()
+
+    def init_lr(self):
+        self.base_lrs = []
+        for i, param_groups in enumerate(self.optimizer.param_groups):
+            param_groups['lr'] = self.min_lrs[i]
+            self.base_lrs.append(self.min_lrs[i])
+
+    def get_lr(self):
+        if self.step_in_cycle == -1:
+            return self.base_lrs
+        elif self.step_in_cycle < self.warmup_steps:
+            return [(max_lr - base_lr) * self.step_in_cycle / self.warmup_steps + base_lr for (max_lr, base_lr) in
+                    zip(self.max_lrs, self.base_lrs)]
+        else:
+            return [base_lr + (max_lr - base_lr) \
+                    * (1 + math.cos(math.pi * (self.step_in_cycle - self.warmup_steps) \
+                                    / (self.cur_cycle_steps - self.warmup_steps))) / 2
+                    for (max_lr, base_lr) in zip(self.max_lrs, self.base_lrs)]
+
+    def step(self, epoch=None):
+        if epoch is None:
+            epoch = self.last_epoch + 1
+            self.step_in_cycle = self.step_in_cycle + 1
+            if self.step_in_cycle >= self.cur_cycle_steps:
+                self.cycle += 1
+                self.step_in_cycle = self.step_in_cycle - self.cur_cycle_steps
+                self.cur_cycle_steps = int(
+                    (self.cur_cycle_steps - self.warmup_steps) * self.cycle_mult) + self.warmup_steps
+        else:
+            if epoch >= self.first_cycle_steps:
+                if self.cycle_mult == 1.:
+                    self.step_in_cycle = epoch % self.first_cycle_steps
+                    self.cycle = epoch // self.first_cycle_steps
+                else:
+                    n = int(math.log((epoch / self.first_cycle_steps * (self.cycle_mult - 1) + 1), self.cycle_mult))
+                    self.cycle = n
+                    self.step_in_cycle = epoch - int(
+                        self.first_cycle_steps * (self.cycle_mult ** n - 1) / (self.cycle_mult - 1))
+                    self.cur_cycle_steps = self.first_cycle_steps * self.cycle_mult ** (n)
+            else:
+                self.cur_cycle_steps = self.first_cycle_steps
+                self.step_in_cycle = epoch
+
+        self.max_lrs = [base_max_lr * (self.gamma ** self.cycle) for base_max_lr in self.base_max_lrs]
+        self.last_epoch = math.floor(epoch)
+
+        for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
+            param_group['lr'] = lr
+
+        self._last_lr = [group['lr'] for group in self.optimizer.param_groups]
+
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(opt, T_0=10, last_epoch=200)
+
+
 device = torch.device("cuda")
 dtype = torch.float32
 
 default_config = {
     "batch_size": 512,
-    "lr_factor": 0.0017,
+    "lr_factor": 0.1,
     "pct_start": 0.2,
     "grad_acc_steps": 1,
 
@@ -34,19 +156,22 @@ wandb.init(project="1_bit_man_cifar10_new", config=default_config)
 # }
 wandbconfig = wandb.config
 
-STEPS = 2441
+KL_WEIGHT = 0.9
 DATASET_SIZE = 50000
 BATCH_SIZE = wandbconfig.batch_size
-EPOCHS = math.ceil(STEPS / (DATASET_SIZE / BATCH_SIZE))
+EPOCHS =  20 #math.ceil(STEPS / (DATASET_SIZE / BATCH_SIZE))
 MOMENTUM = 0.9
-WEIGHT_DECAY = 0
-LR = wandbconfig.lr_factor * BATCH_SIZE
+WEIGHT_DECAY = 5e-4
+LR = wandbconfig.lr_factor * BATCH_SIZE / 256
 GRAD_ACC_STEPS = wandbconfig.grad_acc_steps
 W,H = 32,32
 CUTSIZE = 8
 CROPSIZE = 4
-MAN_WIDTH = 23
+MAN_WIDTH = 1
+IS_FULL_PRECISION = MAN_WIDTH == 23
 PCT_START = wandbconfig.pct_start
+STEPS_PER_EPOCH = DATASET_SIZE / BATCH_SIZE
+TOTAL_STEPS= STEPS_PER_EPOCH * EPOCHS
 
 
 class CNN(nn.Module):
@@ -120,6 +245,8 @@ class QuantisedWrapper(nn.Module):
         self.quant_b = Quantizer(backward_number=bnumber, backward_rounding=round_mode)
 
     def forward(self, x):
+        if IS_FULL_PRECISION:
+            return self.network(x)
         assert torch.all(x.isnan() == False)
         before = self.quant(x)
         assert torch.all(before.isnan() == False)
@@ -189,22 +316,57 @@ class MasterWeightOptimizerWrapper():
             else:
                 model.data.copy_(master.data)
 
+    # def train_direct(self, data, target):
+    #     self.master_weight.zero_grad()
+    #     output = self.master_weight(data)
+    #     loss = self.loss_fn(output, target)
+    #     loss.backward()
+    #     acc = (output.argmax(dim=1) == target).float().mean()
+    #     self.optimizer.step()
+    #     self.scheduler.step()
+    #     return {"loss": loss.item(), "acc": acc.item()}
+
     def train_on_batch(self, data, target):
         self.master_weight.zero_grad()
         self.model_weight.zero_grad()
         output = self.model_weight(data)
         loss = self.loss_fn(output, target)
-        loss = loss * self.grad_scaling
+        # loss = loss * self.grad_scaling
         loss.backward()
         acc = (output.argmax(dim=1) == target).float().mean()
-        loss /= self.grad_acc_steps
+        self.model_grads_to_master_grads()
+        # self.master_grad_apply(lambda x: x / self.grad_scaling)
+        # grad_norm = nn.utils.clip_grad_norm_(self.master_weight.parameters(), self.grad_clip)
+        self.optimizer.step()
+        self.scheduler.step()
+        self.master_params_to_model_params()
+        return {"loss": loss.item(),  "acc": acc.item()}
+
+    def train_with_KLD(self, data, target):
+        self.master_weight.zero_grad()
+        self.model_weight.zero_grad()
+        ce = nn.CrossEntropyLoss(label_smoothing=0.2)
+        kld = nn.KLDivLoss(reduction="batchmean")
+        self.master_params_to_model_params()
+        logits1 = self.model_weight(data)
+        self.master_params_to_model_params()
+        logits2 = self.model_weight(data)
+        kl_weight = KL_WEIGHT
+        ce_loss = (ce(logits1, target) + ce(logits2, target)) / 2
+        kl_1 = kld(F.log_softmax(logits1, dim=-1), F.softmax(logits2, dim=-1)).sum(-1)
+        kl_2 = kld(F.log_softmax(logits2, dim=-1), F.softmax(logits1, dim=-1)).sum(-1)
+        kl_loss = kl_1 + kl_2 / 2
+        loss = (1 - kl_weight) * ce_loss + kl_weight * kl_loss
+        output = (logits1 + logits2) / 2
+        acc = (output.argmax(dim=1) == target).float().mean()
+        loss.backward()
         self.model_grads_to_master_grads()
         self.master_grad_apply(lambda x: x / self.grad_scaling)
         grad_norm = nn.utils.clip_grad_norm_(self.master_weight.parameters(), self.grad_clip)
         self.optimizer.step()
         self.scheduler.step()
-        self.master_params_to_model_params()
-        return {"loss": loss.item(), "grad_norm": grad_norm.item(), "acc": acc.item()}
+        return {"loss": loss.item(), "grad_norm": grad_norm.item(), "acc": acc.item(),
+                "ce_loss": ce_loss.item(), "kl_loss": kl_loss.item()}
 
     def train_with_grad_acc(self, data, target):
         self.master_weight.zero_grad()
@@ -234,15 +396,42 @@ class MasterWeightOptimizerWrapper():
 
 X_train, y_train, X_test, y_test = loadCIFAR10(device)
 
-master_weight = CNN().to(dtype).to(device)
+# master_weight = CNN().to(dtype).to(device)
+# master_weight = torchvision.models.resnet
+
+class ResNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.resnet = torchvision.models.resnet18(num_classes=10)
+    def forward(self, x):
+        return self.resnet(x) / 8
+
+# master_weight = nn.Sequential(torchvision.models.resnet18(num_classes=10), nn.Softmax(dim=1))
+# master_weight = ResNet()
+master_weight = CNN()
+master_weight = master_weight.to(dtype).to(device)
+from torchsummary import summary
+
+summary(master_weight, (3, 32, 32))
 number = qtorch.FloatingPoint(8, MAN_WIDTH)
 master_weight = replace_linear_with_quantized(master_weight, number, number, "stochastic")
 model_weight = copy.deepcopy(master_weight)
-print(master_weight)
 
-opt = torch.optim.SGD(master_weight.parameters(), lr=LR, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY, nesterov=True)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=LR, epochs=EPOCHS, steps_per_epoch=len(X_train)//BATCH_SIZE, pct_start=PCT_START, anneal_strategy='linear',
-                                                div_factor=1e16, final_div_factor=0.07)
+opt = torch.optim.SGD(master_weight.parameters(), lr=LR, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
+scheduler = CosineAnnealingLinearWarmup(
+    optimizer = opt,
+    min_lrs = [1e-5],
+    first_cycle_steps = int(TOTAL_STEPS) ,
+    warmup_steps = int(TOTAL_STEPS * PCT_START),
+    gamma = 0.9
+)
+# scheduler = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=LR, epochs=EPOCHS, steps_per_epoch=len(X_train)//BATCH_SIZE, pct_start=PCT_START, anneal_strategy='linear',
+                                                # div_factor=1e16, final_div_factor=0.07)
+# scheduler = CosineLRScheduler(opt, t_initial=EPOCHS, lr_min=2e-8,
+#                   cycle_mul=1.0, cycle_decay=1.0, cycle_limit=1,
+#                   warmup_t=10, warmup_lr_init=1e-6, warmup_prefix=False, t_in_epochs=True,
+#                   noise_range_t=None, noise_pct=0.67, noise_std=1.0,
+#                   noise_seed=42, k_decay=1.0, initialize=True)
 
 training_time = stepi = 0
 result_log = {}
@@ -315,12 +504,12 @@ for epoch in range(EPOCHS):
 
     for X,y in getBatches(X_train,y_train, True):
         stepi += 1
-        result_log.update(wrapper.train_with_grad_acc(X, y))
+        result_log.update(wrapper.train_on_batch(X, y))
         bar.update(1)
         bar.set_postfix(result_log)
-        result_log["weight_dist"] = weight_distance(initial_weight, master_weight)
-        result_log["weight_norm"] = weight_norm(master_weight)
-        result_log["weight_cos_dist"] = weight_cos_distance(initial_weight, master_weight)
+        # result_log["weight_dist"] = weight_distance(initial_weight, master_weight)
+        # result_log["weight_norm"] = weight_norm(master_weight)
+        # result_log["weight_cos_dist"] = weight_cos_distance(initial_weight, master_weight)
         result_log["lr"] = opt.param_groups[0]["lr"]
         wandb.log(result_log | test_result_m)
 
