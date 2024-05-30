@@ -46,3 +46,5 @@ cifar10/
 data/
 wandb/
 mnist/
+cifar10/
+out/
