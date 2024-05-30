@@ -30,7 +30,7 @@ for batch_size in "${batch_sizes[@]}"; do
       python experiment.py \
       --experiment_name=$experiment_name
       --model=${model} \
-      --dataset=${small_dataset} \
+      --dataset=${dataset} \
       --steps=10_000 \
       --batch_size=$batch_size \
       --weight_man_width=$man_width \
