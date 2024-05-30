@@ -1,3 +1,7 @@
 [submodule "QPyTorch"]
 	path = QPyTorch
-	url = git@github.com:Tiiiger/QPyTorch.git
+	url = git@github.com:LiuTaowen-Tony/QPyTorch.git
+
+[submodule "low_precision_utils"]
+  path = low_precision_utils
+	url = git@github.com:LiuTaowen-Tony/low_precision_utils.git
