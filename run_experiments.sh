@@ -4,10 +4,13 @@ git submodule update --recursive
 
 # Define the grid search parameters
 man_widths=(0 1 2 4 8 16 23)
-batch_sizes=(1 8 16 32 64 128)
+batch_sizes=(1 2 4 8 16 32)
 lrs=(0.03)
 round_mode="stochastic"
-experiment_name="mnist_mlp"
+experiment_name="precision_scheduling_small_logistic"
+model="logistic"
+dataset="small_dataset"
+precision_scheduling=0.8
 
 # Job count for controlling GPU assignment
 job_count=0
@@ -20,19 +23,19 @@ for batch_size in "${batch_sizes[@]}"; do
     # Loop for running each configuration 8 times
     for (( i=1; i<= 8; i++ )); do
       # Calculate GPU ID to use
-      gpu_id=$((job_count % 4))
+      gpu_id=$((job_count % 2 + 1))
 
       cmd="OMP_NUM_THREADS=8 \
       CUDA_VISIBLE_DEVICES=$gpu_id \
       python experiment.py \
       --experiment_name=$experiment_name
-      --model=mnist_mlp \
-      --dataset=mnist \
-      --steps=100_000 \
+      --model=${model} \
+      --dataset=${small_dataset} \
+      --steps=10_000 \
       --batch_size=$batch_size \
       --weight_man_width=$man_width \
       --act_man_width=$man_width \
-
+      --precision_scheduling=$precision_scheduling \
       "
       
       # Run the command in the background
