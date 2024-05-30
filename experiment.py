@@ -226,7 +226,8 @@ for epoch in range(EPOCHS):
         bar.update(1)
         bar.set_postfix(result_log)
         result_log["lr"] = opt.param_groups[0]["lr"]
-        wandb.log(result_log | test_result_m)
+        if stepi % 50 == 0:
+            wandb.log(result_log | test_result_m)
         if stepi >= PRECISION_SCHEDULING_STEP:
             model_weight = apply_number_format(model_weight, full_precision_number, full_precision_number, "stochastic", "stochastic")
             wrapper.weight_quant = lambda x: x
