@@ -4,7 +4,7 @@ git submodule update --recursive
 
 # Define the grid search parameters
 man_widths=(0 1 2 4 8 16 23)
-batch_sizes=(1 4 8 16 32 64 128)
+batch_sizes=(1 8 16 32 64 128)
 lrs=(0.03)
 round_mode="stochastic"
 experiment_name="mnist_mlp"
