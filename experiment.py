@@ -224,7 +224,8 @@ for epoch in range(EPOCHS):
         bar.update(1)
         bar.set_postfix(result_log)
         result_log["lr"] = opt.param_groups[0]["lr"]
-        wandb.log(result_log | test_result_m)
+        if stepi % 50 == 0:
+            wandb.log(result_log | test_result_m)
         if stepi >= DESIRED_STEPS:
             test_result_m = test(master_weight, ((X_test, y_test),))
             grad_entire = ema_grad_on_dataset(master_weight, X_train, y_train)
