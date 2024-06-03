@@ -23,18 +23,19 @@ for batch_size in "${batch_sizes[@]}"; do
     # Loop for running each configuration 8 times
     for (( i=1; i<= 8; i++ )); do
       # Calculate GPU ID to use
-      gpu_id=$((job_count % 1 + 3))
+      gpu_id=$((job_count % 2 + 1))
 
       cmd="OMP_NUM_THREADS=8 \
       CUDA_VISIBLE_DEVICES=$gpu_id \
       python experiment.py \
       --experiment_name=$experiment_name
-      --model=$model \
-      --dataset=$dataset \
+      --model=${model} \
+      --dataset=${dataset} \
       --steps=10_000 \
       --batch_size=$batch_size \
       --weight_man_width=$man_width \
       --act_man_width=$man_width \
+      --precision_scheduling=$precision_scheduling \
       "
       
       # Run the command in the background

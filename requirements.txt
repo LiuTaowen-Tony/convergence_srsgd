@@ -95,3 +95,4 @@ urllib3==2.2.1
 wandb==0.16.6
 wcwidth==0.2.13
 zipp==3.18.1
+-e QPyTorch

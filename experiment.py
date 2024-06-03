@@ -29,6 +29,7 @@ parser.add_argument("--weight_man_width", type=int, default=23)
 parser.add_argument("--weight_rounding", type=str, default="stochastic")
 parser.add_argument("--act_rounding", type=str, default="stochastic")
 parser.add_argument("--batch_size", type=int, default=16)
+parser.add_argument("--precision_scheduling", type=float, default=float("inf"))
 args = parser.parse_args()
 
 wandb.init(project=args.experiment_name, config=args, group=args.group)
@@ -47,6 +48,7 @@ STEPS_PER_EPOCH = DATASET_SIZE // BATCH_SIZE
 EPOCHS = DESIRED_STEPS // STEPS_PER_EPOCH + 1 
 if BATCH_SIZE > DATASET_SIZE:
     EPOCHS = DESIRED_STEPS
+PRECISION_SCHEDULING_STEP = wandbconfig.precision_scheduling * DESIRED_STEPS
 
 MOMENTUM = 0.0
 WEIGHT_DECAY = 0
@@ -234,6 +236,10 @@ for epoch in range(EPOCHS):
         result_log["lr"] = opt.param_groups[0]["lr"]
         if stepi % 50 == 0:
             wandb.log(result_log | test_result_m)
+        if stepi >= PRECISION_SCHEDULING_STEP:
+            model_weight = apply_number_format(model_weight, full_precision_number, full_precision_number, "stochastic", "stochastic")
+            wrapper.weight_quant = lambda x: x
+            PRECISION_SCHEDULING_STEP = float("inf")
         if stepi >= DESIRED_STEPS:
             test_result_m = test(master_weight, ((X_test, y_test),))
             grad_entire = ema_grad_on_dataset(master_weight, X_train, y_train)
