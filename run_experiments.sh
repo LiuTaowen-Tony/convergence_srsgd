@@ -3,14 +3,15 @@
 git submodule update --recursive
 
 # Define the grid search parameters
-man_widths=(0 1 2 4 8 16 23)
-batch_sizes=(1 2 4 8 16 32)
+man_widths=(0 1 2)
+batch_sizes=(1 10 50 100 200 300 400 500 600 700)
 lrs=(0.03)
 round_mode="stochastic"
-experiment_name="precision_scheduling_small_logistic"
+experiment_name="large_batch_size_activation_quant_only"
 model="logistic"
 dataset="small_dataset"
-precision_scheduling=(2 0.8 0.9)
+precision_scheduling=(inf)
+weight_man_width=23
 
 # Job count for controlling GPU assignment
 job_count=0

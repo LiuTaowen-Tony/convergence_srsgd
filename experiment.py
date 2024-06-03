@@ -46,6 +46,8 @@ else:
 BATCH_SIZE = wandbconfig.batch_size
 STEPS_PER_EPOCH = DATASET_SIZE // BATCH_SIZE
 EPOCHS = DESIRED_STEPS // STEPS_PER_EPOCH + 1 
+if BATCH_SIZE > DATASET_SIZE:
+    EPOCHS = DESIRED_STEPS
 PRECISION_SCHEDULING_STEP = wandbconfig.precision_scheduling * DESIRED_STEPS
 
 MOMENTUM = 0.0
@@ -88,6 +90,12 @@ def loadSmallTableData(device):
 
 def getBatches(X, y):
     length = len(X)
+    if BATCH_SIZE > length:
+        # pad X to next multiple of BATCH_SIZE
+        repeat = (BATCH_SIZE + length - 1) // length
+        X = X.repeat(repeat, 1)
+        y = y.repeat(repeat, 1)
+        length = len(X)
     idx = torch.randperm(length)
     X = X[idx]
     y = y[idx]
