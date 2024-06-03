@@ -10,12 +10,13 @@ round_mode="stochastic"
 experiment_name="precision_scheduling_small_logistic"
 model="logistic"
 dataset="small_dataset"
-precision_scheduling=0.8
+precision_scheduling=(2 0.8 0.9)
 
 # Job count for controlling GPU assignment
 job_count=0
 
 # Outer loop for batch_size
+for pr in "${precision_scheduling[@]}"; do
 for lr in "${lrs[@]}"; do
 for batch_size in "${batch_sizes[@]}"; do
   # Inner loop for man_width
@@ -35,7 +36,7 @@ for batch_size in "${batch_sizes[@]}"; do
       --batch_size=$batch_size \
       --weight_man_width=$man_width \
       --act_man_width=$man_width \
-      --precision_scheduling=$precision_scheduling \
+      --precision_scheduling=$pr \
       "
       
       # Run the command in the background
@@ -45,5 +46,6 @@ for batch_size in "${batch_sizes[@]}"; do
     done
     wait
   done
+done
 done
 done
