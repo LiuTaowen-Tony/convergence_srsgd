@@ -3,13 +3,13 @@
 git submodule update --recursive
 
 # Define the grid search parameters
-man_widths=(0 1 2)
-batch_sizes=(1 10 50 100 200 300 400 500 600 700)
-lrs=(0.03)
+man_widths=(23 2 1 0)
+batch_sizes=(800 1200 1600)
+lrs=(0.0001)
 round_mode="stochastic"
-experiment_name="large_batch_size_activation_quant_only"
-model="logistic"
-dataset="small_dataset"
+experiment_name="linear_regression_act_only"
+model="linear"
+dataset="linear"
 precision_scheduling=(inf)
 weight_man_width=23
 
@@ -25,7 +25,7 @@ for batch_size in "${batch_sizes[@]}"; do
     # Loop for running each configuration 8 times
     for (( i=1; i<= 8; i++ )); do
       # Calculate GPU ID to use
-      gpu_id=$((job_count % 2 + 1))
+      gpu_id=$((job_count % 2))
 
       cmd="OMP_NUM_THREADS=8 \
       CUDA_VISIBLE_DEVICES=$gpu_id \
@@ -33,11 +33,12 @@ for batch_size in "${batch_sizes[@]}"; do
       --experiment_name=$experiment_name
       --model=${model} \
       --dataset=${dataset} \
-      --steps=10_000 \
+      --steps=100_000 \
       --batch_size=$batch_size \
-      --weight_man_width=$man_width \
+      --weight_man_width=$weight_man_width \
       --act_man_width=$man_width \
       --precision_scheduling=$pr \
+      --lr=$lr \
       "
       
       # Run the command in the background
