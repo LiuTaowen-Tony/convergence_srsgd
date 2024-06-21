@@ -8,7 +8,6 @@ import copy
 import qtorch
 
 import torch
-from timm.optim import Lamb
 
 from low_precision_utils import utils
 from low_precision_utils.metrics import *
@@ -27,6 +26,7 @@ parser.add_argument("--momentum", type=float, default=0.0)
 parser.add_argument("--steps", type=int, default=10000)
 parser.add_argument("--act_man_width", type=int, default=23)
 parser.add_argument("--weight_man_width", type=int, default=23)
+parser.add_argument("--back_man_width", type=int, default=23)
 parser.add_argument("--weight_rounding", type=str, default="stochastic")
 parser.add_argument("--act_rounding", type=str, default="stochastic")
 parser.add_argument("--batch_size", type=int, default=128)
@@ -36,6 +36,7 @@ parser.add_argument("--watch_interval", type=int, default=100)
 parser.add_argument("--opt", type=str, default="sgd")
 parser.add_argument("--test_nan", action="store_true")
 parser.add_argument("--grad_acc_steps", type=int, default=1)
+parser.add_argument("--same_input", action="store_true")
 args = parser.parse_args()
 
 wandb.init(project=args.experiment_name, config=args)
@@ -186,7 +187,7 @@ class LinearRegression(nn.Module):
 
     def loss_acc(self, x, y):
         output = self(x)
-        loss = (output - y).abs().mean()
+        loss = ((output - y)**2).mean()
         return {"loss": loss, "acc": 0}
 
 class MLP(nn.Module):
@@ -331,9 +332,10 @@ summary(master_weight, master_weight.input_size)
 full_precision_number = qtorch.FloatingPoint(8, 23)
 act_number = qtorch.FloatingPoint(8, ACT_MAN_WIDTH)
 weight_number = qtorch.FloatingPoint(8, WEIGHT_MAN_WIDTH)
+back_number = qtorch.FloatingPoint(8, args.back_man_width)
 master_weight = utils.replace_linear_with_quantized(master_weight, full_precision_number, full_precision_number, "stochastic")
 model_weight = copy.deepcopy(master_weight)
-model_weight = utils.apply_number_format(model_weight, act_number, act_number, args.act_rounding, args.act_rounding)
+model_weight = utils.apply_number_format(model_weight, act_number, back_number, args.act_rounding, args.act_rounding, args.same_input)
 
 if args.opt == "sgd":
     opt = torch.optim.SGD(master_weight.parameters(), lr=LR, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)

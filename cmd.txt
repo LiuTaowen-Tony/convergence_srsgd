@@ -1,0 +1,1 @@
+python experiment.py --experiment_name trial --dataset mnist --model mnist_cnn --act_man_width 1 --weight_man_width 1 --batch_size 32 --lr 0.03 --steps 100_000
