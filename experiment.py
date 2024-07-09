@@ -96,14 +96,13 @@ def test(network: nn.Module, dataset):
 ema_metrics = EMAMetrics()
 
 bar = tqdm.tqdm(range(args.steps))
-training_time = stepi = 0
+stepi = 0
 test_result = {}
 result_log = {}
 grad_log = {}
 result_log = {}
 
 while True:
-    start_time = time.perf_counter()
     for X,y in load_data.getBatches(X_train,y_train,args.batch_size):
         model.train()
         stepi += 1

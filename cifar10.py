@@ -20,10 +20,11 @@ parser.add_argument("--act_rounding", type=str, default="stochastic")
 parser.add_argument("--back_rounding", type=str, default="stochastic")
 parser.add_argument("--same_input", type=lambda x: (str(x).lower() == 'true'), default=False)
 parser.add_argument("--same_weight", type=lambda x: (str(x).lower() == 'true'), default=False)
+parser.add_argument("--epochs",type=int, default=24)
 
 args = parser.parse_args()
 
-EPOCHS = 24
+EPOCHS = args.epochs
 BATCH_SIZE = 512
 MOMENTUM = 0.9
 WEIGHT_DECAY = 5e-4*BATCH_SIZE

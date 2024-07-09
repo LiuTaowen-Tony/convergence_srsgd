@@ -1,7 +1,7 @@
 import subprocess, os
 
 configs = []
-for lr in [0.9, 1.0, 1.1, 1.2, 1.3]:
+for lr in [0.6]:
     for man_width in [0, 1]:
         configs.append({
             "man_width":man_width,
@@ -36,7 +36,7 @@ for lr in [0.9, 1.0, 1.1, 1.2, 1.3]:
     })
 
 def config_to_list(config):
-    l = ["python", "cifar10.py"]
+    l = ["python", "cifar10.py", "--epochs=48"]
     for k, v in config.items():
         if k == "man_width":
             l.append(f"--act_man_width={v}")
@@ -55,10 +55,10 @@ def config_to_list(config):
 for config in configs:
     config["experiment_name"] = "cifar10_unbias"
     handles: list[subprocess.Popen] = []
-    for i in range(4):
+    for i in range(6):
         cmd = config_to_list(config)
         my_env = os.environ.copy()
-        my_env["CUDA_VISIBLE_DEVICES"] = str(i)
+        my_env["CUDA_VISIBLE_DEVICES"] = str(i % 3)
         process = subprocess.Popen(cmd, env=my_env)
         handles.append(process)
     for handle in handles:
