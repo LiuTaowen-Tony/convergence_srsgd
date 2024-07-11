@@ -44,27 +44,63 @@ def build_test_scheme(fman, bman, rounding, same):
     )
 
 ntest_schemes = [
-    build_test_scheme(0, 0, "nearest", True),
-    build_test_scheme(1, 1, "nearest", True),
-    build_test_scheme(2, 2, "nearest", True),
-    build_test_scheme(3, 2, "nearest", True),
-    build_test_scheme(7, 7, "nearest", True),
 
 ]
 
-stest_schemes = [
-    build_test_scheme(0, 0, "stochastic", False),
-    build_test_scheme(1, 1, "stochastic", False),
-    build_test_scheme(2, 2, "stochastic", False),
-    build_test_scheme(3, 2, "stochastic", False),
-    build_test_scheme(7, 7, "stochastic", False),
-]
+stest_schemes = {
+    "stem3leaf0": utils.QuantScheme.build(
+        fnumber=3, bnumber=3, wnumber=3,
+        bwnumber=3, bfnumber=0, bnumber2=0,
+    ),
+    "stem2leaf3": utils.QuantScheme.build(
+        fnumber=2, bnumber=2, wnumber=2,
+        bwnumber=2, bfnumber=3, bnumber2=3,
+    ),
+    "stem0leaf3": utils.QuantScheme.build(
+        fnumber=0, bnumber=0, wnumber=0,
+        bwnumber=0, bfnumber=3, bnumber2=3,
+    ),
+    "f0b0s": build_test_scheme(0, 0, "stochastic", False),
+    "f1b1s": build_test_scheme(1, 1, "stochastic", False),
+    "f2b2s": build_test_scheme(2, 2, "stochastic", False),
+    "f3b3s": build_test_scheme(3, 3, "stochastic", False),
+    "f7b7s": build_test_scheme(7, 7, "stochastic", False),
+    # "f0other23": utils.QuantScheme.build(
+    #     fnumber=0, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=23, bnumber2=23,
+    # ),
+    # "stem23leaf0": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=0, bnumber2=0,
+    # ),
+    # "stem23leaf3": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=3, bnumber2=3,
+    # ),
+    # "stem3leaf0": utils.QuantScheme.build(
+    #     fnumber=3, bnumber=3, wnumber=3,
+    #     bwnumber=3, bfnumber=0, bnumber2=0,
+    # ),
+    # "stem3leaf23": utils.QuantScheme.build(
+    #     fnumber=3, bnumber=3, wnumber=3,
+    #     bwnumber=3, bfnumber=23, bnumber2=23,
+    # ),
+    # "stem3leaf3": utils.QuantScheme.build(
+    #     fnumber=3, bnumber=3, wnumber=3,
+    #     bwnumber=3, bfnumber=3, bnumber2=3,
+    # ),
+    # "f0b0s": build_test_scheme(0, 0, "nearest", True),
+    # "f1b1s": build_test_scheme(1, 1, "nearest", True),
+    # "f2b2s": build_test_scheme(2, 2, "nearest", True),
+    # "f3b2s": build_test_scheme(3, 2, "nearest", True),
+    # "f7b7s": build_test_scheme(7, 7, "nearest", True),
+}
 
 logger = metrics.Logger()
-batch_sizes = [4, 32, 64, 128, 256, 512, 2048]
+batch_sizes = [64]
 
 def describe_scheme(bs, scheme: utils.QuantScheme):
-    return f"bs{bs}_f{scheme.fnumber.man}_b{scheme.bnumber.man}_r{scheme.fround_mode}_{scheme.same_input}"
+    return f"bs{bs}_f{scheme.fnumber.man}_b{scheme.bnumber.man}_r{scheme.fround_mode}"
 
 def test():
     result = {}
@@ -74,22 +110,16 @@ def test():
     acc = loss_acc["acc"] 
     result.update({"test_loss": total_loss, "test_acc": acc})
     for bs in batch_sizes:
+        print(bs)
         for X, y in load_data.getBatches(X_train, y_train, bs): break
         model.apply_quant_scheme(utils.FP32_SCHEME)
-        # loss = model.module.loss_acc(X, y)["loss"]
-        # eigenvalue = metrics.power_iteration_find_hessian_eigen(loss, model.parameters())
-        # result[f"bs{bs}_abs_hessian"] = abs(eigenvalue)
-        # result[f"bs{bs}_hessian"] = eigenvalue
         grad_norm = metrics.grad_on_dataset(model.module, X, y)
         result.update({f"bs{bs}_{k}": v for k, v in grad_norm.items()})
         model.zero_grad()
-        for scheme in ntest_schemes:
-            bias = metrics.grad_bias_deterministic(model, scheme, X, y)
-            result[f"{describe_scheme(bs, scheme)}_bias"] = bias
-        for scheme in stest_schemes:
-            var, bias = metrics.grad_bias_std_norm(model, scheme, X, y)
-            result[f"{describe_scheme(bs, scheme)}_bias"] = bias
-            result[f"{describe_scheme(bs, scheme)}_var"] = var
+        for k,v in stest_schemes.items():
+            bias, var = metrics.grad_error_metrics(model, v, X, y)
+            result[f"bs{bs}_{k}_bias"] = bias
+            result[f"bs{bs}_{k}_var"] = var
     return result
 
 
@@ -108,7 +138,10 @@ try:
                 "acc": acc,
                 "lr": opt.param_groups[0]["lr"]
             })
-            if stepi % (10) == 0:
+            # if stepi % 10 == 0:
+            #     wandb.log(result_log)
+            #     logger.log(result_log | test_result)
+            if stepi % (50) == 0:
                 test_result = test()
                 wandb.log(result_log | test_result)
                 logger.log(result_log | test_result)
