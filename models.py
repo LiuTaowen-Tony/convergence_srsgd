@@ -127,6 +127,7 @@ class MNIST_CNN(nn.Module):
 class CNN(nn.Module):
   def __init__(self):
     super().__init__()
+    self.loss = nn.CrossEntropyLoss(label_smoothing=0.2)
 
     dims = [3,64,128,128,128,256,512,512,512]
     seq = []
@@ -142,6 +143,13 @@ class CNN(nn.Module):
   def forward(self, x):
     x = self.seq(x) / 8
     return x
+
+  def loss_acc(self, x, y):
+    output = self(x)
+    loss = self.loss(output, y)
+    pred = output.argmax(dim=1, keepdim=True)
+    acc = pred.eq(y.view_as(pred)).sum().item() / len(y)
+    return {"loss": loss, "acc": acc}
 
 def get_model(model_name):
     if model_name == "logistic":

@@ -1,6 +1,7 @@
 import torchvision
 import torch
 import pandas as pd
+from torch import nn
 
 def loadMNISTData(device):
     train = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=torchvision.transforms.ToTensor())
@@ -84,3 +85,23 @@ def getBatches(X, y, batch_size):
         if i + batch_size > length:
             break
         yield X[i:i+batch_size], y[i:i+batch_size]
+
+def augment_data(X, y, crop_size=4, cut_size=8, image_width=32, image_height=32):
+    perm = torch.randperm(len(X), device=X.device)
+    X, y = X[perm], y[perm]
+
+    Crop = ([(y0,x0) for x0 in range(crop_size+1) for y0 in range(crop_size+1)], 
+        lambda img, y0, x0 : nn.ReflectionPad2d(crop_size)(img)[..., y0:y0+image_height, x0:x0+image_width])
+    FlipLR = ([(True,),(False,)], 
+        lambda img, choice : torch.flip(img,[-1]) if choice else img)
+    def cutout(img,y0,x0):
+        img[..., y0:y0+cut_size, x0:x0+cut_size] = 0
+        return img
+    Cutout = ([(y0,x0) for x0 in range(image_width+1-cut_size) for y0 in range(image_height+1-cut_size)], cutout)
+
+    for options, transform in (Crop, FlipLR, Cutout):
+        optioni = torch.randint(len(options),(len(X),), device=X.device)
+        for i in range(len(options)):
+            X[optioni==i] = transform(X[optioni==i], *options[i])
+
+    return X, y
