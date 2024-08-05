@@ -41,9 +41,11 @@ def build_test_scheme(fman, bman, rounding, same):
         bwround_mode=rounding,
     )
 
-ntest_schemes = [
-
-]
+ntest_schemes = {
+    "f0b0n": build_test_scheme(0, 0, "nearest", False),
+    "f1b1n": build_test_scheme(1, 1, "nearest", False),
+    "f2b2n": build_test_scheme(2, 2, "nearest", False),
+}
 
 # we know that if we have unbiased estimator of gradient
 # we have
@@ -76,30 +78,30 @@ stest_schemes = {
     "f2b2s": build_test_scheme(2, 2, "stochastic", False),
     # "f3b3s": build_test_scheme(3, 3, "stochastic", False),
     # "f7b7s": build_test_scheme(7, 7, "stochastic", False),
-    "b20other23": utils.QuantScheme.build(
-        fnumber=23, bnumber=23, wnumber=23,
-        bwnumber=23, bfnumber=23, bnumber2=0,
-    ),
-    "bf0other23": utils.QuantScheme.build(
-        fnumber=23, bnumber=23, wnumber=23,
-        bwnumber=23, bfnumber=0, bnumber2=23,
-    ),
-    "bw0other23": utils.QuantScheme.build(
-        fnumber=23, bnumber=23, wnumber=23,
-        bwnumber=0, bfnumber=23, bnumber2=23,
-    ),
-    "w0other23": utils.QuantScheme.build(
-        fnumber=23, bnumber=23, wnumber=0,
-        bwnumber=23, bfnumber=23, bnumber2=23,
-    ),
-    "b0other23": utils.QuantScheme.build(
-        fnumber=23, bnumber=0, wnumber=23,
-        bwnumber=23, bfnumber=23, bnumber2=23,
-    ),
-    "f0other23": utils.QuantScheme.build(
-        fnumber=0, bnumber=23, wnumber=23,
-        bwnumber=23, bfnumber=23, bnumber2=23,
-    ),
+    # "b20other23": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=23, bnumber2=0,
+    # ),
+    # "bf0other23": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=0, bnumber2=23,
+    # ),
+    # "bw0other23": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=23,
+    #     bwnumber=0, bfnumber=23, bnumber2=23,
+    # ),
+    # "w0other23": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=23, wnumber=0,
+    #     bwnumber=23, bfnumber=23, bnumber2=23,
+    # ),
+    # "b0other23": utils.QuantScheme.build(
+    #     fnumber=23, bnumber=0, wnumber=23,
+    #     bwnumber=23, bfnumber=23, bnumber2=23,
+    # ),
+    # "f0other23": utils.QuantScheme.build(
+    #     fnumber=0, bnumber=23, wnumber=23,
+    #     bwnumber=23, bfnumber=23, bnumber2=23,
+    # ),
     # "stem23leaf0": utils.QuantScheme.build(
     #     fnumber=23, bnumber=23, wnumber=23,
     #     bwnumber=23, bfnumber=0, bnumber2=0,
@@ -128,7 +130,7 @@ stest_schemes = {
 }
 
 logger = metrics.Logger()
-batch_sizes = [8192]
+batch_sizes = [512, 8192]
 
 def describe_scheme(bs, scheme: utils.QuantScheme):
     return f"bs{bs}_f{scheme.fnumber.man}_b{scheme.bnumber.man}_r{scheme.fround_mode}"
@@ -149,6 +151,11 @@ def test():
         grad_norm = metrics.grad_on_dataset(model.module, X, y)
         result.update({f"bs{bs}_{k}": v for k, v in grad_norm.items()})
         model.zero_grad()
+        for k,v in ntest_schemes.items():
+            dot, e_error_norm = metrics.grad_error_metrics_deterministic(model, v, X, y)
+            result[f"bs{bs}_{k}_dot"] = dot
+            result[f"bs{bs}_{k}_e_error_norm"] = e_error_norm
+            result[f"bs{bs}_{k}_bias_norm"] = e_error_norm
         for k,v in stest_schemes.items():
             dot, e_error_norm, bias_norm = metrics.grad_error_metrics(model, v, X, y)
             result[f"bs{bs}_{k}_dot"] = dot
