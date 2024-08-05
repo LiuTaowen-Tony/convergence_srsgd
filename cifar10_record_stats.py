@@ -73,9 +73,9 @@ stest_schemes = {
     #     fnumber=3, bnumber=3, wnumber=3,
     #     bwnumber=3, bfnumber=0, bnumber2=0,
     # ),
-    "f0b0s": build_test_scheme(0, 0, "stochastic", False),
-    "f1b1s": build_test_scheme(1, 1, "stochastic", False),
-    "f2b2s": build_test_scheme(2, 2, "stochastic", False),
+    # "f0b0s": build_test_scheme(0, 0, "stochastic", False),
+    # "f1b1s": build_test_scheme(1, 1, "stochastic", False),
+    # "f2b2s": build_test_scheme(2, 2, "stochastic", False),
     # "f3b3s": build_test_scheme(3, 3, "stochastic", False),
     # "f7b7s": build_test_scheme(7, 7, "stochastic", False),
     # "b20other23": utils.QuantScheme.build(
