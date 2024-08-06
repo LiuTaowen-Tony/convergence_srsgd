@@ -23,24 +23,6 @@ test_result = {}
 
 
 
-def build_test_scheme(fman, bman, rounding, same):
-    fnumber = qtorch.FloatingPoint(8, fman)
-    bnumber = qtorch.FloatingPoint(8, bman)
-    return utils.QuantScheme(
-        fnumber=fnumber,
-        bnumber=bnumber,
-        wnumber=fnumber,
-        fround_mode=rounding,
-        bround_mode=rounding,
-        wround_mode=rounding,
-        same_input=same,
-        same_weight=same,
-        bfnumber=bnumber,
-        bfround_mode=rounding,
-        bwnumber=bnumber,
-        bwround_mode=rounding,
-    )
-
 ntest_schemes = [
 
 ]
@@ -67,64 +49,7 @@ ntest_schemes = [
 # how to make a quant scheme that has less bias, but variance can be reduced as increasing the batchsize
 
 stest_schemes = {
-    # "stem3leaf0": utils.QuantScheme.build(
-    #     fnumber=3, bnumber=3, wnumber=3,
-    #     bwnumber=3, bfnumber=0, bnumber2=0,
-    # ),
-    # "f0b0s": build_test_scheme(0, 0, "stochastic", False),
-    # "f1b1s": build_test_scheme(1, 1, "stochastic", False),
-    # "f2b2s": build_test_scheme(2, 2, "stochastic", False),
-    # "f3b3s": build_test_scheme(3, 3, "stochastic", False),
-    # "f7b7s": build_test_scheme(7, 7, "stochastic", False),
-    # "b20other23": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=23,
-    #     bwnumber=23, bfnumber=23, bnumber2=0,
-    # ),
-    # "bf0other23": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=23,
-    #     bwnumber=23, bfnumber=0, bnumber2=23,
-    # ),
-    # "bw0other23": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=23,
-    #     bwnumber=0, bfnumber=23, bnumber2=23,
-    # ),
-    # "w0other23": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=0,
-    #     bwnumber=23, bfnumber=23, bnumber2=23,
-    # ),
-    # "b0other23": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=0, wnumber=23,
-    #     bwnumber=23, bfnumber=23, bnumber2=23,
-    # ),
-    # "f0other23": utils.QuantScheme.build(
-    #     fnumber=0, bnumber=23, wnumber=23,
-    #     bwnumber=23, bfnumber=23, bnumber2=23,
-    # ),
-    # "stem23leaf0": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=23,
-    #     bwnumber=23, bfnumber=0, bnumber2=0,
-    # ),
-    # "stem23leaf3": utils.QuantScheme.build(
-    #     fnumber=23, bnumber=23, wnumber=23,
-    #     bwnumber=23, bfnumber=3, bnumber2=3,
-    # ),
-    # "stem3leaf0": utils.QuantScheme.build(
-    #     fnumber=3, bnumber=3, wnumber=3,
-    #     bwnumber=3, bfnumber=0, bnumber2=0,
-    # ),
-    # "stem3leaf23": utils.QuantScheme.build(
-    #     fnumber=3, bnumber=3, wnumber=3,
-    #     bwnumber=3, bfnumber=23, bnumber2=23,
-    # ),
-    # "stem3leaf3": utils.QuantScheme.build(
-    #     fnumber=3, bnumber=3, wnumber=3,
-    #     bwnumber=3, bfnumber=3, bnumber2=3,
-    # ),
-    # "f0b0s": build_test_scheme(0, 0, "nearest", True),
-    # "f1b1s": build_test_scheme(1, 1, "nearest", True),
-    # "f2b2s": build_test_scheme(2, 2, "nearest", True),
-    # "f3b2s": build_test_scheme(3, 2, "nearest", True),
-    # "f7b7s": build_test_scheme(7, 7, "nearest", True),
+  
 }
 
 logger = metrics.Logger()

@@ -6,7 +6,7 @@ import models
 import load_data
 import wandb
 from low_precision_utils import utils
-from low_precision_utils import log_util
+from ml_utils import log_util
 
 device = torch.device("cuda")
 dtype = torch.float32
@@ -20,7 +20,6 @@ args = parser.parse_args()
 
 
 quant_scheme = utils.QuantScheme.from_args(args)
-args.quant_scheme = json.loads(args.quant_scheme_json)
 logger = log_util.Logger.from_args(args)
 
 EPOCHS = args.epochs

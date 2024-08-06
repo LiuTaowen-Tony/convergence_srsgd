@@ -15,8 +15,8 @@ def loadMNISTData(device):
     return train_data, train_labels, test_data, test_labels
 
 def loadCIFAR10(device):
-  train = torchvision.datasets.CIFAR10(root="./cifar10", train=True, download=True)
-  test  = torchvision.datasets.CIFAR10(root="./cifar10", train=False, download=True)
+  train = torchvision.datasets.CIFAR10(root="./data/cifar10", train=True, download=True)
+  test  = torchvision.datasets.CIFAR10(root="./data/cifar10", train=False, download=True)
   ret = [torch.tensor(i, device=device) for i in (train.data, train.targets, test.data, test.targets)]
   std, mean = torch.std_mean(ret[0].float(),dim=(0,1,2),unbiased=True,keepdim=True)
   for i in [0,2]: ret[i] = ((ret[i]-mean)/std).to(torch.float32).permute(0,3,1,2)
@@ -44,12 +44,12 @@ def loadLinearData(device):
             torch.tensor(y_test, dtype=torch.float32).view(-1, 1).to(device))
 
 def loadSmallTableData(device):
-    train_data = pd.read_csv('train_data.csv')
+    train_data = pd.read_csv('data/train_data.csv')
     X_train = train_data.drop('purchased', axis=1).values
     y_train = train_data['purchased'].values
 
     # Load the test data
-    test_data = pd.read_csv('test_data.csv')
+    test_data = pd.read_csv('data/test_data.csv')
     X_test = test_data.drop('purchased', axis=1).values
     y_test = test_data['purchased'].values
 

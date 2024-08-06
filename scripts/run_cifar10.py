@@ -1,67 +1,42 @@
-import subprocess, os
+import json
+import itertools
+import subprocess
+import time
+from ml_utils.job_queue import JobQueue
 
-configs = []
-for lr in [0.6]:
-    for man_width in [0, 1]:
-        configs.append({
-            "man_width":man_width,
-            "rounding": "stochastic",
-            "same_input": False,
-            "same_weight": False,
-            "lr": lr,
-        })
-        configs.append({
-            "man_width": man_width,
-            "rounding": "nearest",
-            "same_input": True,
-            "same_weight": True,
-            "lr": lr,
-        })
-        # for same_input in [True, False]:
-        #     for same_weight in [True, False]:
-        #         configs.append({
-        #             "man_width": man_width,
-        #             "rounding": "stochastic",
-        #             "same_input": same_input,
-        #             "same_weight": same_weight,
-        #             "lr": lr,
-        #         })
+# Define the parameter space
+params_space = {
+    "bact.wl": [4],
+    "bweight.wl": [4],
+    "goact.wl": [7],
+    "goweight.wl": [4],
+    "rounding": ["nearest", "stochastic"],
+}
 
-    configs.append({
-        "man_width": 23,
-        "rounding": "stochastic",
-        "same_input": False,
-        "same_weight": False,
-        "lr": lr
-    })
-
-def config_to_list(config):
-    l = ["python", "cifar10.py", "--epochs=48"]
-    for k, v in config.items():
-        if k == "man_width":
-            l.append(f"--act_man_width={v}")
-            l.append(f"--weight_man_width={v}")
-            l.append(f"--back_man_width={v}")
-            continue
-        if k == "rounding":
-            l.append(f"--act_rounding={v}")
-            l.append(f"--weight_rounding={v}")
-            l.append(f"--back_rounding={v}")
-            continue
-        l.append(f"--{k}={v}")
-    return l
-        
-
-for config in configs:
-    config["experiment_name"] = "cifar10_unbias"
-    handles: list[subprocess.Popen] = []
-    for i in range(6):
-        cmd = config_to_list(config)
-        my_env = os.environ.copy()
-        my_env["CUDA_VISIBLE_DEVICES"] = str(i % 3)
-        process = subprocess.Popen(cmd, env=my_env)
-        handles.append(process)
-    for handle in handles:
-        handle.wait()
-    print("Done with config", config)
+# Function to create and run the command
+def run_experiment(device, params):
+    # Generate the command to run the experiment
+    cmd = [f"CUDA_VISIBLE_DEVICES={device}", "python", "cifar10.py", ]
+    json_dict = {}
+    for key, value in params.items():
+        if "wl" in key:
+            name = key.split(".")[0]
+            json_dict[name] = {"number_type": "scaled_int", "round_mode": params["rounding"],"wl": value}
     
+    cmd.append(f"--quant_scheme '{json.dumps(json_dict)}'")
+    # Run the command and return the process
+    print(" ".join(cmd))
+    subprocess.run(" ".join(cmd), shell=True)
+
+queue = JobQueue(4, 1)
+
+# Generate all possible combinations of parameters
+callables = []
+for params in itertools.product(*params_space.values()):
+    # Create a dictionary of parameters
+    params = {key: value for key, value in zip(params_space.keys(), params)}
+    # Add the job to the queue
+    callables.append(lambda device: run_experiment(device, params))
+
+# Run the jobs
+queue.map(callables)
