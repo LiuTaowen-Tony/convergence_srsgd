@@ -53,7 +53,7 @@ stest_schemes = {
 }
 
 logger = metrics.Logger()
-batch_sizes = [8192]
+batch_sizes = [512, 8192]
 
 def describe_scheme(bs, scheme: utils.QuantScheme):
     return f"bs{bs}_f{scheme.fnumber.man}_b{scheme.bnumber.man}_r{scheme.fround_mode}"
@@ -74,6 +74,11 @@ def test():
         grad_norm = metrics.grad_on_dataset(model.module, X, y)
         result.update({f"bs{bs}_{k}": v for k, v in grad_norm.items()})
         model.zero_grad()
+        for k,v in ntest_schemes.items():
+            dot, e_error_norm = metrics.grad_error_metrics_deterministic(model, v, X, y)
+            result[f"bs{bs}_{k}_dot"] = dot
+            result[f"bs{bs}_{k}_e_error_norm"] = e_error_norm
+            result[f"bs{bs}_{k}_bias_norm"] = e_error_norm
         for k,v in stest_schemes.items():
             dot, e_error_norm, bias_norm = metrics.grad_error_metrics(model, v, X, y)
             result[f"bs{bs}_{k}_dot"] = dot
