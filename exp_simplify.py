@@ -6,7 +6,7 @@ import torch
 import time
 import qtorch
 
-from low_precision_utils import utils
+from low_precision_utils import quant
 from low_precision_utils.metrics import *
 
 device = torch.device("cuda")
@@ -40,7 +40,7 @@ wandb.init(project=args.experiment_name, config=args)
 wandbconfig = wandb.config
 
 if wandbconfig.test_nan:
-    utils.TEST_NAN = True
+    quant.TEST_NAN = True
 
 DESIRED_STEPS = wandbconfig.steps
 DATASET_SIZE = 404

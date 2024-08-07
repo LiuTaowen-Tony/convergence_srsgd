@@ -9,7 +9,7 @@ import qtorch
 import qtorch.quant
 from torchsummary import summary
 
-from low_precision_utils import utils
+from low_precision_utils import quant
 from low_precision_utils.metrics import *
 
 import models
@@ -41,7 +41,7 @@ args = parser.parse_args()
 
 
 if args.test_nan:
-    utils.TEST_NAN = True
+    quant.TEST_NAN = True
 
 PRECISION_SCHEDULING_STEP = args.precision_scheduling * args.steps
 args.weight_decay = 0
@@ -53,7 +53,7 @@ full_precision_number = qtorch.FloatingPoint(8, 23)
 act_number = qtorch.FloatingPoint(8, args.act_man_width)
 weight_number = qtorch.FloatingPoint(8, args.weight_man_width)
 back_number = qtorch.FloatingPoint(8, args.back_man_width)
-quant_scheme = utils.QuantScheme(act_number, back_number, weight_number, 
+quant = quant.QuantScheme(act_number, back_number, weight_number, 
                                  args.act_rounding, args.back_rounding, args.weight_rounding,
                                  args.same_input, args.same_weight)
 
@@ -63,8 +63,8 @@ X_train, y_train, X_test, y_test = data_loader(device)
 model = models.get_model(args.model)  
 model = model.to(dtype).to(device)
 summary(model, model.input_size)
-model = utils.replace_with_quantized(model, quant_scheme)
-model = utils.apply_quant_scheme(model, quant_scheme)
+model = quant.replace_with_quantized(model, quant)
+model = quant.apply_quant_scheme(model, quant)
 
 if args.opt == "sgd":
     opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
