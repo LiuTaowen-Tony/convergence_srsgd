@@ -18,7 +18,7 @@ parser = log_util.add_log_args(parser, "cifar10", default_log_interval=1, defaul
 args = parser.parse_args()
 
 
-quant = quant.QuantScheme.from_args(args)
+quant_scheme = quant.QuantScheme.from_args(args)
 logger = log_util.Logger.from_args(args)
 
 EPOCHS = args.epochs
@@ -27,7 +27,7 @@ MOMENTUM = 0.9
 WEIGHT_DECAY = 5e-4
 
 model = models.CNN().to(device)
-model = quant.QuantWrapper(model, quant)
+model = quant.QuantWrapper(model, quant_scheme)
 X_train, y_train, X_test, y_test = load_data.loadCIFAR10(device)
 opt = torch.optim.SGD(model.parameters(), lr=0.0, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY, nesterov=True)
 scheduler = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=0.6, total_steps=EPOCHS*len(X_train)//BATCH_SIZE, pct_start=0.2)
