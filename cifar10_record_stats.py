@@ -8,8 +8,7 @@ from utils import models
 import torch
 import ml_utils
 
-from argparse import ArgumentParser
-EPOCHS = 7
+EPOCHS = 1
 BATCH_SIZE=512
 
 model = models.CNN().to(torch.device("cuda"))
@@ -24,9 +23,6 @@ test_result = {}
 
 
 
-ntest_schemes = [
-
-]
 
 # we know that if we have unbiased estimator of gradient
 # we have
@@ -52,14 +48,39 @@ ntest_schemes = [
 fx8 = quant.ScaledIntQuant(fl=8)
 fx6 = quant.ScaledIntQuant(fl=6)
 fx4 = quant.ScaledIntQuant(fl=4)
+fx8d = quant.ScaledIntQuant(fl=8, round_mode="nearest")
+fx4d = quant.ScaledIntQuant(fl=4, round_mode="nearest")
+fp0 = quant.FPQuant(man=0)
+fp0d = quant.FPQuant(man=0, round_mode="nearest")
+
 
 stest_schemes = {
-    "leaf_only8" : quant.QuantScheme(goweight=fx8, bact=fx8),
-    "leaf_only6" : quant.QuantScheme(goweight=fx8, bact=fx8),
-    "leaf_only4" : quant.QuantScheme(goweight=fx8, bact=fx8),
+    # "leaf_only16" : quant.QuantScheme(goweight=fx16, bact=fx16),
+    # "leaf_only22" : quant.QuantScheme(bact=fx4),
+    "forward4" : quant.QuantScheme(act=fx4, weight=fx4),
+    "forward8" : quant.QuantScheme(act=fx8, weight=fx8),
+    "allfp0" : quant.QuantScheme(act=fp0, weight=fp0, goweight=fp0, bact=fp0, goact=fp0, bweight=fp0),
+    "all4" : quant.QuantScheme(act=fx4, weight=fx4, goweight=fx4, bact=fx4, goact=fx4, bweight=fx4),
+    "all8" : quant.QuantScheme(act=fx8, weight=fx8, goweight=fx8, bact=fx8, goact=fx8, bweight=fx8),
+    "back8" : quant.QuantScheme(goweight=fx8, bact=fx8, goact=fx8, bweight=fx8),
+    "back4" : quant.QuantScheme(goweight=fx4, bact=fx4, goact=fx4, bweight=fx4),
+    "leaf8" : quant.QuantScheme(goweight=fx8, bact=fx8),
+    "leaf4" : quant.QuantScheme(goweight=fx4, bact=fx4),
 }
 
-logger = ml_utils.log_util.Logger()
+ntest_schemes = {
+    "forward4d" : quant.QuantScheme(act=fx4d, weight=fx4d),
+    "forward8d" : quant.QuantScheme(act=fx8d, weight=fx8d),
+    "allfp0d" : quant.QuantScheme(act=fp0d, weight=fp0d, goweight=fp0d, bact=fp0d, goact=fp0d, bweight=fp0d),
+    "all4d" : quant.QuantScheme(act=fx4d, weight=fx4d, goweight=fx4d, bact=fx4d, goact=fx4d, bweight=fx4d),
+    "all8d" : quant.QuantScheme(act=fx8d, weight=fx8d, goweight=fx8d, bact=fx8d, goact=fx8d, bweight=fx8d),
+    "back8d" : quant.QuantScheme(goweight=fx8d, bact=fx8d, goact=fx8d, bweight=fx8d),
+    "back4d" : quant.QuantScheme(goweight=fx4d, bact=fx4d, goact=fx4d, bweight=fx4d),
+    "leaf8d" : quant.QuantScheme(goweight=fx8d, bact=fx8d),
+    "leaf4d" : quant.QuantScheme(goweight=fx4d, bact=fx4d),
+}
+
+logger = ml_utils.log_util.Logger(1)
 batch_sizes = [512]
 
 def test():
@@ -75,19 +96,28 @@ def test():
         print(bs)
         for X, y in load_data.getBatches(X_train, y_train, bs): break
         model.apply_quant_scheme(quant.FP32_SCHEME)
-        grad_norm = metrics.grad_on_dataset(model.module, X, y)
-        result.update({f"bs{bs}_{k}": v for k, v in grad_norm.items()})
+        # grad_norm = metrics.grad_on_dataset(model.module, X, y)
+        # result.update({f"&bs={bs}&metrics={k}": v for k, v in grad_norm.items()})
         model.zero_grad()
-        # for k,v in ntest_schemes.items():
-        #     dot, e_error_norm = metrics.grad_error_metrics_deterministic(model, v, X, y)
-        #     result[f"bs{bs}_{k}_dot"] = dot
-        #     result[f"bs{bs}_{k}_e_error_norm"] = e_error_norm
-        #     result[f"bs{bs}_{k}_bias_norm"] = e_error_norm
-        for k,v in stest_schemes.items():
-            dot, e_error_norm, bias_norm = metrics.grad_error_metrics(model, v, X, y)
-            result[f"bs{bs}_{k}_dot"] = dot
-            result[f"bs{bs}_{k}_e_error_norm"] = e_error_norm
-            result[f"bs{bs}_{k}_bias_norm"] = bias_norm
+        for i,v in stest_schemes.items():
+            for rounds in [25, 100, 400]:
+                # r = metrics.per_layer_grad_error_metrics(model, v, X, y, rounds)
+                # result.update({f"&bs={bs}&scheme={i}&rounds={rounds}{k}" : v for k, v in r.items()})
+                cos, var, bias = metrics.grad_error_metrics(model, v, X, y, rounds)
+                result.update({
+                    f"&bs={bs}&scheme={i}&rounds={rounds}&metric=cos" : cos,
+                    f"&bs={bs}&scheme={i}&rounds={rounds}&metric=var" : var,
+                    f"&bs={bs}&scheme={i}&rounds={rounds}&metric=bias" : bias
+                })
+        for i,v in ntest_schemes.items():
+            # r = metrics.per_layer_grad_error_metrics_deterministic(model, v, X, y)
+            # result.update({f"&bs={bs}&scheme={i}&rounds={rounds}{k}" : v for k, v in r.items()})
+            cos, var, bias = metrics.grad_error_metrics_deterministic(model, v, X, y)
+            result.update({
+                f"&bs={bs}&scheme={i}&rounds={rounds}&metric=cos" : cos,
+                f"&bs={bs}&scheme={i}&rounds={rounds}&metric=var" : var,
+                f"&bs={bs}&scheme={i}&rounds={rounds}&metric=bias" : bias
+            })
     return result
 
 stepi = 0
@@ -103,6 +133,7 @@ for epoch in range(EPOCHS):
         opt.step()
         scheduler.step()
     test_result = test()
+    print(test_result)
     logger.log(test_result)
     print(loss, acc)
 
