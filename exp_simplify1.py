@@ -1,5 +1,6 @@
 import wandb
 import pandas as pd
+from torch import nn
 import qtorch.quant
 import tqdm
 import torch
@@ -7,7 +8,7 @@ import time
 import qtorch
 
 from low_precision_utils import quant
-from low_precision_utils.metrics import *
+from low_precision_utils import metrics
 
 device = torch.device("cuda")
 dtype = torch.float32
@@ -77,62 +78,70 @@ def getBatches(X, y, batch_size=-1):
 
 X_train, y_train, X_test, y_test = loadLinearData(device)
 
-def lp_grad(w, b, x, y):
-    y = y.view(-1, 1)
-    x_q = qtorch.quant.float_quantize(x, 8, args.act_man_width, "stochastic")
-    x_q2 = qtorch.quant.float_quantize(x, 8, args.act_man_width, "stochastic")
-    w_q = qtorch.quant.float_quantize(w, 8, args.weight_man_width, "stochastic")
 
-    y_pred = x_q @ w_q + b
-    loss = ((y_pred - y) ** 2).mean()
-    y_pred_grad = 2 * (y_pred - y) / len(y)
-    y_pred_grad_q = qtorch.quant.float_quantize(y_pred_grad, 8, args.act_man_width, "stochastic")
-
-    w_grad = x_q2.t() @ y_pred_grad_q
-    b_grad = y_pred_grad_q.sum()
-    return w_grad, b_grad, loss
-
-def full_precision_grad(w, b, x, y):
-    y_pred = x @ w + b
-    loss = ((y_pred - y) ** 2).mean()
-    y_pred_grad = 2 * (y_pred - y) / len(y)
-    w_grad = x.T @ y_pred_grad 
-    b_grad = y_pred_grad.sum()
-    return w_grad, b_grad, loss
+def grad(network: quant.QuantWrapper, x, y, require_grad_norm=True):
+    network.train()
+    total_norm = 0
+    network.zero_grad()
+    y_pred = network(x)
+    loss = (y - y_pred) ** 2
+    loss.backward()
+    result = {"loss": loss.item()}
+    if require_grad_norm:
+        total_norm = nn.utils.clip_grad_norm_(network.parameters(), float('inf'))
+        result["grad_norm_entire"] = total_norm.item()
+    return result
 
 
 training_time = stepi = 0
 bar = tqdm.tqdm(range(DESIRED_STEPS))
+low_scheme = quant.QuantScheme(
+    quant.FP32,
+    quant.FP32,
+    quant.FPQuant(8, args.act_man_width),
+    quant.FPQuant(8, args.weight_man_width),
+    quant.FPQuant(8, args.act_man_width),
+    quant.FPQuant(8, args.act_man_width)
+)
 
-ema_metrics = EMAMetrics()
 result_log = {}
 
 epoch = 0
-w = torch.randn(5, 1, requires_grad=False, device=device)
-b = torch.randn(1, requires_grad=False, device=device)
+
+class Net:
+    def __init__(self):
+        self.fc1 = nn.Linear(5, 10)
+        self.relu1 = nn.ReLU()
+        self.fc2 = nn.Linear(10, 10)
+        self.relu2 = nn.ReLU()
+        self.fc3 = nn.Linear(10, 1)
+    
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu1(x) 
+        x = self.fc2  (x) 
+        x = self.relu2(x) 
+        x = self.fc3  (x) 
+        return x
+
+network = quant.QuantWrapper()
 
 while True:
     epoch += 1
     for X,y in getBatches(X_train,y_train, args.batch_size):
-        stepi += 1
-        grad_w, grad_b, loss = lp_grad(w, b, X, y)
-        w -= LR * grad_w
-        b -= LR * grad_b
-        result_log["loss"] = loss.item()
-
         if stepi % 100 == 0:
-            lp_grad_w, lp_grad_b, lp_loss = lp_grad(w, b, X_train, y_train)
-            # lp_grad on training set
-            full_grad_w, full_grad_b, full_loss = full_precision_grad(w, b, X_train, y_train)
-            # full_grad on training set
-            lp_grad_norm = torch.sqrt((lp_grad_w ** 2).sum() + (lp_grad_b ** 2).sum())
-            full_grad_norm = torch.sqrt((full_grad_w ** 2).sum() + (full_grad_b ** 2).sum())
-
-            result_log["lp_grad_loss"] = lp_loss.item()
-            result_log["full_grad_loss"] = full_loss.item()
-            result_log["lp_grad_norm"] = lp_grad_norm.item()
-            result_log["full_grad_norm"] = full_grad_norm.item()
+            lp_result = grad(network, X, y, True)
+            network.apply_quant_scheme(quant.FP32_SCHEME)
+            full_result = grad(network, X, y, True)
+            network.apply_quant_scheme(low_scheme)
+            result_log["lp_grad_loss"] = lp_result["loss"]
+            result_log["full_grad_loss"] = full_result["loss"]
+            result_log["full_grad_norm"] = full_result["grad_norm_entire"]
+            result_log["lp_grad_norm"] = lp_result["grad_norm_entire"]
             wandb.log(result_log)
+        else:
+            result = grad(network, X, y, False)
+            result_log["loss"] = result["loss"]
             # print(
             #     f"""lp loss: {loss.item()}, f loss {full_loss.item()}, lp grad norm: {lp_grad_norm.item()}, f grad norm: {full_grad_norm.item()}"""
             # )
