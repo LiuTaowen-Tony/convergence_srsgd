@@ -16,11 +16,11 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument("--experiment_name", type=str)
-parser.add_argument("--lr", type=float, default=0.03)
-parser.add_argument("--act_man_width", type=int, default=23)
-parser.add_argument("--weight_man_width", type=int, default=23)
-parser.add_argument("--back_man_width", type=int, default=23)
-parser.add_argument("--batch_size", type=int, default=128)
+parser.add_argument("--lr", type=float, default=0.01)
+parser.add_argument("--act_man_width", type=int, default=8)
+parser.add_argument("--weight_man_width", type=int, default=8)
+parser.add_argument("--back_man_width", type=int, default=8)
+parser.add_argument("--batch_size", type=int, default=31)
 args = parser.parse_args()
 
 wandb.init(project=args.experiment_name, config=args)
@@ -28,8 +28,6 @@ wandb.init(project=args.experiment_name, config=args)
 
 DATASET_SIZE = 404
 DESIRED_STEPS = 10_000
-WEIGHT_DECAY = 0
-LR = 0.03
 
 def loadLinearData(device):
     from sklearn.model_selection import train_test_split
@@ -84,7 +82,7 @@ def grad(network: quant.QuantWrapper, x, y, require_grad_norm=True):
     total_norm = 0
     network.zero_grad()
     y_pred = network(x)
-    loss = (y - y_pred) ** 2
+    loss = ((y - y_pred) ** 2).mean()
     loss.backward()
     result = {"loss": loss.item()}
     if require_grad_norm:
@@ -98,23 +96,28 @@ bar = tqdm.tqdm(range(DESIRED_STEPS))
 low_scheme = quant.QuantScheme(
     quant.FP32,
     quant.FP32,
-    quant.FPQuant(8, args.act_man_width),
-    quant.FPQuant(8, args.weight_man_width),
-    quant.FPQuant(8, args.act_man_width),
-    quant.FPQuant(8, args.act_man_width)
+    quant.NPoint(args.act_man_width),
+    quant.NPoint(args.weight_man_width),
+    quant.NPoint(args.act_man_width),
+    quant.NPoint(args.act_man_width)
+    # quant.FPQuant(8, args.act_man_width),
+    # quant.FPQuant(8, args.weight_man_width),
+    # quant.FPQuant(8, args.act_man_width),
+    # quant.FPQuant(8, args.act_man_width)
 )
 
 result_log = {}
 
 epoch = 0
 
-class Net:
+class Net(nn.Module):
     def __init__(self):
-        self.fc1 = nn.Linear(5, 10)
+        super().__init__()
+        self.fc1 = nn.Linear(5, 50)
         self.relu1 = nn.ReLU()
-        self.fc2 = nn.Linear(10, 10)
+        self.fc2 = nn.Linear(50, 50)
         self.relu2 = nn.ReLU()
-        self.fc3 = nn.Linear(10, 1)
+        self.fc3 = nn.Linear(50, 1)
     
     def forward(self, x):
         x = self.fc1(x)
@@ -124,13 +127,19 @@ class Net:
         x = self.fc3  (x) 
         return x
 
-network = quant.QuantWrapper()
+network = Net()
+network.to(device)
+network = quant.QuantWrapper(network)
+sgd = torch.optim.SGD(network.parameters(), lr=args.lr)
+logger = metrics
 
 while True:
     epoch += 1
     for X,y in getBatches(X_train,y_train, args.batch_size):
-        if stepi % 100 == 0:
+        stepi += 1
+        if stepi % 1 == 0:
             lp_result = grad(network, X, y, True)
+            sgd.step()
             network.apply_quant_scheme(quant.FP32_SCHEME)
             full_result = grad(network, X, y, True)
             network.apply_quant_scheme(low_scheme)

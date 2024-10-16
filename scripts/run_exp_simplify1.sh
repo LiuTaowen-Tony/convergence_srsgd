@@ -3,13 +3,12 @@
 git submodule update --recursive
 
 # Define the grid search parameters
-act_man_widths=(0 1 2 23)
-weight_man_widths=(23)
-batch_sizes=(20 40)
-#batch_sizes=(1280)
-lrs=(0.03)
+act_man_widths=(2 3 4 8)
+weight_man_widths=(8)
+batch_sizes=(1000 2000) 
+lrs=(0.015)
 round_mode="stochastic"
-experiment_name="back_only_act_only2"
+experiment_name="back_only_act_only5"
 model="linear"
 dataset="linear"
 
@@ -29,11 +28,12 @@ for batch_size in "${batch_sizes[@]}"; do
 
       cmd="OMP_NUM_THREADS=1 \
       CUDA_VISIBLE_DEVICES=$gpu_id \
-      time python exp_simplify.py \
+      time python exp_simplify1.py \
       --experiment_name=$experiment_name
       --batch_size=$batch_size \
       --weight_man_width=$weight_man_width \
       --act_man_width=$man_width \
+      --lr=$lr \
       "
       
       # Run the command in the background

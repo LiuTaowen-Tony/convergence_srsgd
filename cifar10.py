@@ -13,8 +13,9 @@ dtype = torch.float32
 parser = ArgumentParser()
 parser.add_argument("--lr", type=float, default=0.6)
 parser.add_argument("--epochs",type=int, default=24)
+parser.add_argument("--batch_size",type=int, default=512)
 parser = quant.add_argparse(parser)
-parser = log_util.add_log_args(parser, "cifar10", default_log_interval=1, default_wandb_interval=1, default_wandb_watch_interval=1)
+parser = log_util.add_log_args(parser, "cifar10_3", default_log_interval=1, default_wandb_interval=1, default_wandb_watch_interval=1)
 args = parser.parse_args()
 
 
@@ -22,7 +23,7 @@ quant_scheme = quant.QuantScheme.from_args(args)
 logger = log_util.Logger.from_args(args)
 
 EPOCHS = args.epochs
-BATCH_SIZE = 512
+BATCH_SIZE = args.batch_size
 MOMENTUM = 0.9
 WEIGHT_DECAY = 5e-4
 
