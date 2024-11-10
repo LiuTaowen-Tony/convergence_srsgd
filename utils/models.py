@@ -57,7 +57,6 @@ class MNIST_MLP(nn.Module):
         self.linear1 = nn.Linear(28 * 28, 100)
         self.linear2 = nn.Linear(100, 10)
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -66,7 +65,6 @@ class MNIST_MLP(nn.Module):
 
     def loss_acc(self, x, y):
         output = self(x)
-        output = self.softmax(output)
         loss = self.criterion(output, y)
         pred = output.argmax(dim=1, keepdim=True)
         acc = pred.eq(y.view_as(pred)).sum().item() / len(y)
@@ -79,7 +77,6 @@ class MNIST_MLP_500(nn.Module):
         self.linear1 = nn.Linear(28 * 28, 500)
         self.linear2 = nn.Linear(500, 10)
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -88,7 +85,6 @@ class MNIST_MLP_500(nn.Module):
 
     def loss_acc(self, x, y):
         output = self(x)
-        output = self.softmax(output)
         assert not torch.any(torch.isnan(output))
         loss = self.criterion(output, y)
         pred = output.argmax(dim=1, keepdim=True)
@@ -104,7 +100,6 @@ class MNIST_CNN(nn.Module):
         self.conv3 = nn.Conv2d(64, 64, 3, 3)
         self.adaptive_pool = nn.AdaptiveMaxPool2d((1, 1))
         self.head = nn.Linear(64, 10)
-        self.softmax = nn.Softmax(dim=1)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -118,7 +113,6 @@ class MNIST_CNN(nn.Module):
     
     def loss_acc(self, x, y):
         output = self(x)
-        output = self.softmax(output)
         loss = self.criterion(output, y)
         pred = output.argmax(dim=1, keepdim=True)
         acc = pred.eq(y.view_as(pred)).sum().item() / len(y)

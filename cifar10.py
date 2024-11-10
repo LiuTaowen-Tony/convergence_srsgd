@@ -31,7 +31,7 @@ model = models.CNN().to(device)
 model = quant.QuantWrapper(model, quant_scheme)
 X_train, y_train, X_test, y_test = load_data.loadCIFAR10(device)
 opt = torch.optim.SGD(model.parameters(), lr=0.0, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY, nesterov=True)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=0.6, total_steps=EPOCHS*len(X_train)//BATCH_SIZE, pct_start=0.2)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=args.lr, total_steps=EPOCHS*len(X_train)//BATCH_SIZE, pct_start=0.2)
 
 # logger.wandb_watch(model)
 print(model)

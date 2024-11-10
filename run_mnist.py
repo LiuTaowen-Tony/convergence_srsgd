@@ -11,12 +11,12 @@ JobQueue = job_queue.JobQueue
 
 # Define the parameter space
 params_space = {
-    "bact.wl": [16, 32, 64],
-    "bweight.wl": [64],
-    "goact.wl": [64],
-    "goweight.wl": [64],
+    "bact.wl": [0.01, 0.0],
+    "bweight.wl": [0.0],
+    "goact.wl": [0.0],
+    "goweight.wl": [0.0],
     "batch_size": [64, 128, 256, 512],
-    "lr": [0.1, 0.2, 0.3, 0.4, 0.5],
+    "lr": [0.003],
     "rounding": ["stochastic"],
 }
 
@@ -24,17 +24,17 @@ params_space = {
 # Function to create and run the command
 def get_cmd(params):
     # Generate the command to run the experiment
-    cmd = ["python", "cifar10.py", ]
+    cmd = ["python", "experiment2.py", ]
     json_dict = {}
     for key, value in params.items():
         if "wl" in key:
             name = key.split(".")[0]
-            json_dict[name] = {"number_type": "npoints", "round_mode": params["rounding"],"points": value}
+            json_dict[name] = {"number_type": "noise","std": 0.01}
     
     cmd.append(f"--quant_scheme '{json.dumps(json_dict)}'")
     cmd.append(f"--batch_size {params['batch_size']}")
     cmd.append(f"--lr {params['lr']}")
-    cmd.append(f"--experiment_name cifar10_6 > /dev/null")
+    cmd.append(f"--experiment_name mnist1 > /dev/null")
     # Run the command and return the process
     return " ".join(cmd)
 
